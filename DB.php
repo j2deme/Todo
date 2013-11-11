@@ -247,6 +247,12 @@ class DB {
   }
 
   public function toJson(){
+    foreach($result as $row) {
+      foreach ($row as $key => $value) {
+      }
+      //$row['task'] = utf8_encode($row['task']);
+      //$rows[] = $row;
+    }
   }
 
   public function create($name, $cols = []){
@@ -275,9 +281,13 @@ class DB {
     return $this->sql("TRUNCATE TABLE $table");
   }
 
-  public function pretty(){
+  public function pretty($arr = []){
     echo "<pre>";
-    print_r($this->result);
+    if(!empty($arr) && is_array($arr)){
+      print_r($arr);
+    } else {
+      print_r($this->result);
+    }
     echo "</pre>";
   }
 }

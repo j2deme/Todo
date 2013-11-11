@@ -14,6 +14,6 @@ $db->save('test',[
   'age' => 26,
   'address' => 'Rio Eufrates #151'
   ]);
-  $db->findAll('test');
-  $db->pretty();
+  json_encode($db->findAll('test'));
+  //$db->pretty();
 ?>
