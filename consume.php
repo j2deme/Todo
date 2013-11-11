@@ -1,6 +1,8 @@
 <?php
 # consume.php
-$curl = curl_init('http://127.0.0.1/TecValles/Todo/json.php?id=2');
-echo json_decode(curl_exec($curl));
-curl_close($curl);
+include 'DB.php';
+$db = new DB("root","root","localhost","todo");
+$url = 'http://127.0.0.1/TecValles/Todo/json.php';
+$url .= (isset($_GET['id'])) ? '?id='.$_GET['id'] : "";
+$db->pretty($db->toArray($db->getJson($url)));
 ?>

@@ -250,22 +250,8 @@ class DB {
     }
   }
 
-  public function toJson(){
-    $rows = $this->result;
-    foreach ($this->result as $row) {
-      foreach ($row as $key => $value) {
-        if(is_string($value)){
-          $row[$key] = json_encode($value);
-        } else {
-          $row[$key] = $value;
-        }
-      }
-    }
-    return json_encode($rows, JSON_NUMERIC_CHECK);
-  }
-
-  public function toArray($string){
-    return json_decode(utf8_decode($string),true);
+  public function debug(){
+    return $this->st->debugDumpParams();
   }
 
   public function create($name, $cols = []){
@@ -315,6 +301,44 @@ class DB {
       $result = utf8_decode($input);
     }
     return $result;
+  }
+
+  public function toJson(){
+    $rows = $this->result;
+    if(empty($this->result)){
+      return json_encode([], JSON_NUMERIC_CHECK);
+    } else {
+      if(is_array($this->result) && !isset($this->result['id'])){
+        foreach ($this->result as $row) {
+          foreach ($row as $key => $value) {
+            if(is_string($value)){
+              $row[$key] = json_encode($value);
+            } else {
+              $row[$key] = $value;
+            }
+          }
+        }
+      }
+      return json_encode($rows, JSON_NUMERIC_CHECK);
+    }
+  }
+
+  public function getJson($url, $use_curl = true){
+    if ($use_curl) {
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+      $feed = curl_exec($ch);
+      curl_close($ch);
+    } else {
+      $feed = @file_get_contents($url);
+    }
+    return $feed;
+  }
+
+  public function toArray($string){
+    return json_decode(utf8_decode($string),true);
   }
 }
 ?>
