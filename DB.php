@@ -71,7 +71,7 @@ class DB {
       $this->result = $this->st->fetch();
       $this->disconnect();
       return $this->utf8_decode_mix($this->result);
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
       return $e->getMessage();
     }
   }
@@ -105,7 +105,7 @@ class DB {
       $this->result = $this->st->FetchAll();
       $this->disconnect();
       return $this->utf8_decode_mix($this->result);
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
       return $e->getMessage();
     }
   }
@@ -162,7 +162,7 @@ class DB {
         $this->result = $this->st->execute();
         $this->disconnect();
         return $this->result;
-      } catch (PDOException $e) {
+      } catch (Exception $e) {
         return $e->getMessage();
       }
     } else {
@@ -196,7 +196,7 @@ class DB {
       $this->result = $this->st->execute();
       $this->disconnect();
       return $this->result;
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
       return $e->getMessage();
     }
   }
@@ -226,7 +226,7 @@ class DB {
         }
       }
       return $this->utf8_decode_mix($this->result);
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
       return $e->getMessage();
     }
   }
