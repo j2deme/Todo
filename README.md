@@ -62,7 +62,7 @@ Recibe 2 parámetros, siendo el primero el nombre de la tabla, y el segundo un a
 Si el arreglo pasado como segundo parámetro contiene la llave __id__, se considera como una actualización (`UPDATE`), en caso de que la llave no este presente se supone una inserción (`INSERT INTO`), es __importante__ que todas las columnas que no permitan valores nulos esten presentes en el arreglo dado.
 
 ```php
-$db->save("tasks"); //Genera un "false"
+$db->save("tasks"); //Devolvería false
 $data = [
   'task'=>"Learn PDO",
   'date'=>"29/11/13"
@@ -194,7 +194,7 @@ Recibe un único parámetro, el cual indica el nombre de la tabla a eliminar. An
 
 ```php
 $db->drop("contacts"); //Elimina la tabla 'contacts' y todos sus datos
-$db->drop("tabla_no_existente"); //Devuelve 'false'
+$db->drop("tabla_no_existente"); //Devuelve false
 ```
 
 ### truncate()
@@ -215,8 +215,47 @@ $db->truncate("contacts"); //Elimina todos los registros y reinicia contadores
 - `toArray()`
 
 ### toJson()
+
+Devuelve el resultado de la última consulta en formato JSON.
+
+```php
+$db->findAll('tasks');
+//Para forzar el formato JSON en UTF-8
+header('Content-type: application/json; charset=utf-8');
+echo $db->toJson();
+```
+
+Devolvería por ejemplo:
+```json
+[
+  {"id":1,"task":"Ense\u00f1ar a los alumnos de BDD PHP"},
+  {"id":2,"task":"Publicar material de PHP"},
+  {"id":3,"task":"Texto corregido"},
+  {"id":4,"task":"Tarea de prueba correcta"}
+]
+```
+
 ### getJson()
+
+Recibe como parámetro un `string` que contiene la dirección desde donde se obtendrá el archivo JSON, la cual puede ser un archivo JSON estático o un archivo PHP que produzca un JSON.
+
+Puede recibir un segundo parámetro booleano opcional, que indica si se utiliza `curl` o `file_get_contents` para leer el archivo, por default se utiliza `curl`. Devuelve un `string` con el JSON obtenido o un `false` si hay algún error.
+
+```php
+$url = "https://api.github.com/users/j2deme/repos";
+$db->getJson($url); //Devuelve una string conteniendo la respuesta en JSON
+```
+
+La url de ejemplo muestra en formato JSON todos los repositorios relacionados a mi cuenta: [j2deme](https://api.github.com/users/j2deme/repos).
+
 ### toArray()
+
+Recibe como parámetro un `string` conteniendo un arreglo codificado en JSON, y devuelve un arreglo asociativo análogo al JSON suministrado.
+
+```php
+$url = "https://api.github.com/users/j2deme/repos";
+$db->toArray($db->getJson($url)):
+```
 
 ## Debugging
 
