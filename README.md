@@ -144,7 +144,7 @@ try {
   ... //Inserciones, actualizacionesy borrados
   $db->end(); //Finaliza la transacción sino hubo problemas
 } catch(Exception $e){
-  $db->rollback(); //Deshace los cambios si hubo algún problema
+  $db->cancel(); //Deshace los cambios si hubo algún problema
   return $e->getMessage();
 }
 ```
@@ -160,7 +160,7 @@ try {
   }
   $db->end(); //Finaliza la transacción sino hubo problemas
 } catch(Exception $e){
-  $db->rollback(); //Deshace los cambios si hubo algún problema
+  $db->cancel(); //Deshace los cambios si hubo algún problema
   return $e->getMessage();
 }
 ```
