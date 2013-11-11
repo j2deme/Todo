@@ -12,8 +12,7 @@ $db->save('test',[
   'id' => 1,
   'name' => 'Jaime J. Delgado',
   'age' => 26,
-  'address' => 'Rio Eufrates #151'
+  'address' => 'Río Niño Eufrates #151'
   ]);
-  json_encode($db->findAll('test'));
-  //$db->pretty();
+  $db->pretty(json_encode($db->find('test',['id'=>1])));
 ?>
