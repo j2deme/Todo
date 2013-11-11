@@ -16,6 +16,15 @@ class DB {
     $this->pass = $pass;
     $this->host = $host;
     $this->dbname = $dbname;
+    try {
+      $this->connect();
+    } catch (PDOException $e) {
+      return $e->getMessage();
+    }
+  }
+
+  function __destruct(){
+    $this->disconnect();
   }
 
   private function connect(){
@@ -60,20 +69,14 @@ class DB {
       }
     }
 
-    try {
-      $this->connect();
-      $this->st = $this->dbh->prepare($sql);
-      $this->st->setFetchMode(PDO::FETCH_ASSOC);
-      foreach ($data as $key => $value) {
-        $this->bind($key,$value);
-      }
-      $this->st->execute();
-      $this->result = $this->st->fetch();
-      $this->disconnect();
-      return $this->utf8_decode_mix($this->result);
-    } catch (Exception $e) {
-      return $e->getMessage();
+    $this->st = $this->dbh->prepare($sql);
+    $this->st->setFetchMode(PDO::FETCH_ASSOC);
+    foreach ($data as $key => $value) {
+      $this->bind($key,$value);
     }
+    $this->st->execute();
+    $this->result = $this->st->fetch();
+    return $this->utf8_decode_mix($this->result);
   }
 
   public function findAll($table, $data = []){
@@ -94,20 +97,15 @@ class DB {
       }
     }
 
-    try {
-      $this->connect();
-      $this->st = $this->dbh->prepare($sql);
-      $this->st->setFetchMode(PDO::FETCH_ASSOC);
-      foreach ($data as $key => $value) {
-        $this->bind($key,$value);
-      }
-      $this->st->execute();
-      $this->result = $this->st->FetchAll();
-      $this->disconnect();
-      return $this->utf8_decode_mix($this->result);
-    } catch (Exception $e) {
-      return $e->getMessage();
+    $this->st = $this->dbh->prepare($sql);
+    $this->st->setFetchMode(PDO::FETCH_ASSOC);
+    foreach ($data as $key => $value) {
+      $this->bind($key,$value);
     }
+    $this->st->execute();
+    $this->result = $this->st->FetchAll();
+    $this->disconnect();
+    return $this->utf8_decode_mix($this->result);
   }
 
   public function save($table, $data = []){
@@ -153,18 +151,13 @@ class DB {
         $sql .= ")";
       }
 
-      try {
-        $this->connect();
-        $this->st = $this->dbh->prepare($sql);
-        foreach ($data as $key => $value) {
-          $this->bind($key,$value);
-        }
-        $this->result = $this->st->execute();
-        $this->disconnect();
-        return $this->result;
-      } catch (Exception $e) {
-        return $e->getMessage();
+      $this->st = $this->dbh->prepare($sql);
+      foreach ($data as $key => $value) {
+        $this->bind($key,$value);
       }
+      $this->result = $this->st->execute();
+      $this->disconnect();
+      return $this->result;
     } else {
       return false;
     }
@@ -187,18 +180,13 @@ class DB {
         }
       }
     }
-    try {
-      $this->connect();
-      $this->st = $this->dbh->prepare($sql);
-      foreach ($data as $key => $value) {
-        $this->bind($key,$value);
-      }
-      $this->result = $this->st->execute();
-      $this->disconnect();
-      return $this->result;
-    } catch (Exception $e) {
-      return $e->getMessage();
+    $this->st = $this->dbh->prepare($sql);
+    foreach ($data as $key => $value) {
+      $this->bind($key,$value);
     }
+    $this->result = $this->st->execute();
+    $this->disconnect();
+    return $this->result;
   }
 
   public function count(){
@@ -210,25 +198,20 @@ class DB {
   }
 
   public function sql($sql, $data = []){
-    try {
-      $this->connect();
-      $this->st = $this->dbh->prepare($sql);
-      foreach ($data as $key => $value) {
-        $this->bind($key,$value);
-      }
-      $this->result = $this->st->execute();
-      $this->disconnect();
-      if(strpos(strtolower($sql),"select") !== false ){
-        if($this->count() > 1){
-          $this->result = $this->st->FetchAll();
-        } else {
-          $this->result = $this->st->fetch();
-        }
-      }
-      return $this->utf8_decode_mix($this->result);
-    } catch (Exception $e) {
-      return $e->getMessage();
+    $this->st = $this->dbh->prepare($sql);
+    foreach ($data as $key => $value) {
+      $this->bind($key,$value);
     }
+    $this->result = $this->st->execute();
+    $this->disconnect();
+    if(strpos(strtolower($sql),"select") !== false ){
+      if($this->count() > 1){
+        $this->result = $this->st->FetchAll();
+      } else {
+        $this->result = $this->st->fetch();
+      }
+    }
+    return $this->utf8_decode_mix($this->result);
   }
 
   private function bind($param, $value, $type = null){
@@ -277,11 +260,19 @@ class DB {
   }
 
   public function drop($name){
-    return $this->sql("DROP TABLE IF EXISTS $name");
+    if(!empty($name)){
+      return $this->sql("DROP TABLE IF EXISTS $name");
+    } else {
+      return false;
+    }
   }
 
   public function truncate($table){
-    return $this->sql("TRUNCATE TABLE $table");
+    if(!empty($name)){
+      return $this->sql("TRUNCATE TABLE $table");
+    } else {
+      return false;
+    }
   }
 
   public function pretty($arr = []){
