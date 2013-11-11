@@ -81,11 +81,84 @@ Recibe 2 parámetros, el primero la tabla sobre la cual se trabajará (`DELETE F
 
 Es __importante__ notar que si no se envía el segundo parámetro, por default se asume un 1, ejecutandose un `DELETE FROM tabla WHERE 1`, eliminando __todos__ los registros de la tabla.
 
+### count()
+
+No contiene parámetros, y devuelve el número de filas contenidas en el resultado de la última consulta.
+
+```php
+$db->find("tasks",['id'=>1]); //Primer registro que coincida con id = 1
+echo $db->count(); //Devuelve 1
+$db->findAll("tasks"); //Suponiendo que existan 10 registros
+echo $db->count(); //Devuelve 10
+```
+
+### lastId()
+
+Devuelve el __id__ del último registro insertado, no requiere de parámetros.
+
+```php
+//Suponiendo 10 registros consecutivos, con ids del 1 al 10
+$db->save("tasks",['task' => "Test lastId() Function"]); //Una inserción, puesto que no se indica id
+echo $db->lastId(); //Devolvería 11
+```
+
+### sql()
+
+Permite manejar consultas más complejas, como _selects_ con condiciones unidas por mezclas de disyunciones (`OR`), conjunciones (`AND`) y negaciones (`NOT`), o comparaciones de valores menores, mayores o diferentes a un rango o valor (`id < 5` o `id > 10` o `id <> 4`), inserciones, actualizaciones o borrados complejos, e incluso comandos DDL.
+
+Recibe dos parámeros, el primero un _string_ conteniendo un _prepared statement_ (preferentemente), y el segundo (opcional), un arreglo de pares llave-valor que reemplazen los espacios en el _prepared statement_, si así corresponde.
+
+```php
+$data = [
+  'min' => 2,
+  'max' => 5
+];
+//Selecciona una columna específica con una condición dada por un rango
+$db->sql("SELECT task FROM tasks WHERE id > :min AND id < :max",$data);
+
+//Creación de una tabla - Se recomienda usar la función create()
+$data = [
+  'col1' => "name varchar(50) NOT NULL",
+  'col2' => "age int NOT NULL",
+  'col3' => "sex varchar(1) DEFAULT 'H'"
+];
+$db->sql("CREATE TABLE :tabla (id int PRIMARY KEY AUTO_INCREMENT,:col1,:col2,:col2)", $data);
+```
+
 ## Transacciones
 
 - `begin()`
 - `end()`
 - `cancel()`
+
+Permiten el manejo de transacciones, y deben estar contenidas dentro de un __try-catch__.
+
+```php
+try {
+  $db->begin(); //Inicia la transacción
+  ... //Inserciones, actualizacionesy borrados
+  $db->end(); //Finaliza la transacción sino hubo problemas
+} catch(Exception $e){
+  $db->rollback(); //Deshace los cambios si hubo algún problema
+  return $e->getMessage();
+}
+```
+
+También es posible lanzar una excepción si alguna condición deseada no se cumple.
+
+```php
+try {
+  $db->begin(); //Inicia la transacción
+  $db->find("users",['username' => "j2deme", 'password'=> "12345"']); //Busca a un usuario específico
+  if($db->count() == 0){ //No se encontró al usuario
+    throw new MyException("Usuario no válido");
+  }
+  $db->end(); //Finaliza la transacción sino hubo problemas
+} catch(Exception $e){
+  $db->rollback(); //Deshace los cambios si hubo algún problema
+  return $e->getMessage();
+}
+```
 
 ## Manejo básico de tablas
 
