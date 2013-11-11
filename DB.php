@@ -70,7 +70,7 @@ class DB {
       $this->st->execute();
       $this->result = $this->st->fetch();
       $this->disconnect();
-      return $this->result;
+      return $this->utf8_decode_mix($this->result);
     } catch (PDOException $e) {
       return $e->getMessage();
     }
@@ -104,7 +104,7 @@ class DB {
       $this->st->execute();
       $this->result = $this->st->FetchAll();
       $this->disconnect();
-      return $this->result;
+      return $this->utf8_decode_mix($this->result);
     } catch (PDOException $e) {
       return $e->getMessage();
     }
@@ -221,7 +221,7 @@ class DB {
           $this->result = $this->st->fetch();
         }
       }
-      return $this->result;
+      return $this->utf8_decode_mix($this->result);
     } catch (PDOException $e) {
       return $e->getMessage();
     }
@@ -243,16 +243,29 @@ class DB {
               $type = PDO::PARAM_STR;
       }
     }
-    $this->st->bindValue($param, $value, $type);
+    if($type == PDO::PARAM_STR){
+      $this->st->bindValue($param, utf8_encode($value), $type);
+    } else {
+      $this->st->bindValue($param, $value, $type);
+    }
   }
 
   public function toJson(){
-    foreach($result as $row) {
+    $rows = $this->result;
+    foreach ($this->result as $row) {
       foreach ($row as $key => $value) {
+        if(is_string($value)){
+          $row[$key] = json_encode($value);
+        } else {
+          $row[$key] = $value;
+        }
       }
-      //$row['task'] = utf8_encode($row['task']);
-      //$rows[] = $row;
     }
+    return json_encode($rows, JSON_NUMERIC_CHECK);
+  }
+
+  public function toArray($string){
+    return json_decode(utf8_decode($string),true);
   }
 
   public function create($name, $cols = []){
@@ -283,12 +296,25 @@ class DB {
 
   public function pretty($arr = []){
     echo "<pre>";
-    if(!empty($arr) && is_array($arr)){
+    if(!empty($arr)){
       print_r($arr);
     } else {
       print_r($this->result);
     }
     echo "</pre>";
+  }
+
+  private function utf8_decode_mix($input, $decode_keys = false){
+    if(is_array($input)){
+        $result = array();
+        foreach($input as $k => $v){
+          $key = ($decode_keys)? utf8_decode($k) : $k;
+          $result[$key] = $this->utf8_decode_mix( $v, $decode_keys);
+        }
+    } else {
+      $result = utf8_decode($input);
+    }
+    return $result;
   }
 }
 ?>
