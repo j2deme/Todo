@@ -112,57 +112,61 @@ class DB {
 
   public function save($table, $data = []){
     $sql = "";
-    if(isset($data['id'])){
-      $sql .= "UPDATE $table SET ";
-      $attrs = [];
-      foreach ($data as $col => $value) {
-        if($col != 'id'){
-          $attrs[] = "$col=:$col";
+    if(empty($data)){
+      if(isset($data['id'])){
+        $sql .= "UPDATE $table SET ";
+        $attrs = [];
+        foreach ($data as $col => $value) {
+          if($col != 'id'){
+            $attrs[] = "$col=:$col";
+          }
         }
-      }
-      for ($i=0; $i < count($attrs); $i++) {
-        if($i == (count($attrs) - 1)){
-          $sql .= $attrs[$i]." ";
-        } else {
-          $sql .= $attrs[$i].", ";
+        for ($i=0; $i < count($attrs); $i++) {
+          if($i == (count($attrs) - 1)){
+            $sql .= $attrs[$i]." ";
+          } else {
+            $sql .= $attrs[$i].", ";
+          }
         }
-      }
-      $sql .= "WHERE id=:id";
-    } else {
-      $sql .= "INSERT INTO $table (";
-      $attrs = [];
-      foreach ($data as $col => $value) {
-          $attrs[] = $col;
-      }
-      for ($i=0; $i < count($attrs); $i++) {
-        if($i == (count($attrs) - 1)){
-          $sql .= $attrs[$i]."";
-        } else {
-          $sql .= $attrs[$i].",";
+        $sql .= "WHERE id=:id";
+      } else {
+        $sql .= "INSERT INTO $table (";
+        $attrs = [];
+        foreach ($data as $col => $value) {
+            $attrs[] = $col;
         }
-      }
-      $sql .= ") VALUES (";
-      for ($i=0; $i < count($attrs); $i++) {
-        if($i == (count($attrs) - 1)){
-          $sql .= ":".$attrs[$i]."";
-        } else {
-          $sql .= ":".$attrs[$i].",";
+        for ($i=0; $i < count($attrs); $i++) {
+          if($i == (count($attrs) - 1)){
+            $sql .= $attrs[$i]."";
+          } else {
+            $sql .= $attrs[$i].",";
+          }
         }
+        $sql .= ") VALUES (";
+        for ($i=0; $i < count($attrs); $i++) {
+          if($i == (count($attrs) - 1)){
+            $sql .= ":".$attrs[$i]."";
+          } else {
+            $sql .= ":".$attrs[$i].",";
+          }
+        }
+        $sql .= ")";
       }
-      $sql .= ")";
-    }
 
-    try {
-      $this->connect();
-      $this->st = $this->dbh->prepare($sql);
-      foreach ($data as $key => $value) {
-        $this->bind($key,$value);
+      try {
+        $this->connect();
+        $this->st = $this->dbh->prepare($sql);
+        foreach ($data as $key => $value) {
+          $this->bind($key,$value);
+        }
+        $this->result = $this->st->execute();
+        $this->disconnect();
+        return $this->result;
+      } catch (PDOException $e) {
+        return $e->getMessage();
       }
-      $this->result = $this->st->execute();
-      $this->disconnect();
-      return $this->result;
-    } catch (PDOException $e) {
-      return $e->getMessage();
+    } else {
+      return false;
     }
   }
 
