@@ -154,7 +154,7 @@ También es posible lanzar una excepción si alguna condición deseada no se cum
 ```php
 try {
   $db->begin(); //Inicia la transacción
-  $db->find("users",['username' => "j2deme", 'password'=> "12345"']); //Busca a un usuario específico
+  $db->find("users",['username' => "j2deme", 'password'=> "12345"]); //Busca a un usuario específico
   if($db->count() == 0){ //No se encontró al usuario
     throw new MyException("Usuario no válido");
   }
@@ -171,13 +171,57 @@ try {
 - `drop()`
 - `truncate()`
 
+### create()
+
+Permite la creación de tablas, sino existen, en caso contrario no realiza la creación.
+
+Recibe como entrada dos parámetros, el primero el nombre de la tabla, y el segundo (opcional) un arreglo conteniendo las definiciones de las columnas, en pares llave-valor, donde la llave indica el nombre de la columna y el valor indica tipo, restricciones y valores default.
+
+En caso de que no se indique el segundo parámetro, por default se crea el campo __id__ entero, autonumérico como llave primaria (`id int PRIMARY KEY AUTO_INCREMENT NOT NULL`).
+
+```php
+$cols = [
+  'id' => 'int PRIMARY KEY AUTO_INCREMENT NOT NULL',
+  'name' => 'varchar(50) NOT NULL',
+  'age' => 'int',
+  'address' => 'text'
+];
+$db->create('contacts', $cols);
+```
+### drop()
+
+Recibe un único parámetro, el cual indica el nombre de la tabla a eliminar. Antes de intentar la eliminación, se hace la verificación de que la tabla exista, caso contrario no se elimina nada. Si no se envía el parámetro necesario, devuelve `false`.
+
+```php
+$db->drop("contacts"); //Elimina la tabla 'contacts' y todos sus datos
+$db->drop("tabla_no_existente"); //Devuelve 'false'
+```
+
+### truncate()
+
+Elimina todos los registros de la tabla indicada como parámetro, sino se indica parámetro devuelve `false`. A diferencia de ejecutar un comando `DELETE FROM tabla WHERE 1`, esta función ejecuta un `TRUNCATE TABLE tabla` que además de eliminar los registros, también reinicia los valores autonúmericos.
+
+Usar `truncate()` es más rápido y eficiente computacionalmente que usar `delete()`.
+
+```php
+$db->delete("contacts"); //Elimina todos los registros
+$db->truncate("contacts"); //Elimina todos los registros y reinicia contadores
+```
+
 ## Conversión de formatos
 
 - `toJson()`
 - `getJson()`
 - `toArray()`
 
+### toJson()
+### getJson()
+### toArray()
+
 ## Debugging
 
 - `debug()`
 - `pretty()`
+
+### debug()
+### pretty()
