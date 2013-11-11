@@ -81,6 +81,11 @@ Recibe 2 parámetros, el primero la tabla sobre la cual se trabajará (`DELETE F
 
 Es __importante__ notar que si no se envía el segundo parámetro, por default se asume un 1, ejecutandose un `DELETE FROM tabla WHERE 1`, eliminando __todos__ los registros de la tabla.
 
+```php
+$db->delete("tasks",['id'=>2]); //Elimina registro con id = 2
+$db->delete("tasks"); //Elimina todos los registros - Se recomienda usar la función truncate()
+```
+
 ### count()
 
 No contiene parámetros, y devuelve el número de filas contenidas en el resultado de la última consulta.
