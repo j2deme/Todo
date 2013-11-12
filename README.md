@@ -254,7 +254,7 @@ Recibe como parámetro un `string` conteniendo un arreglo codificado en JSON, y 
 
 ```php
 $url = "https://api.github.com/users/j2deme/repos";
-$db->toArray($db->getJson($url)):
+$db->toArray($db->getJson($url));
 ```
 
 ## Debugging
@@ -263,4 +263,37 @@ $db->toArray($db->getJson($url)):
 - `pretty()`
 
 ### debug()
+
+Muestra los parámetros pasados a la conexión generada mediante PDO, por la última consulta realizada, tales como el _prepared statement_ y sus parámetros. Útil cuando hay duda al utilizar la función `sql()`.
+
+__No__ lleva ningún parámetro.
+
+```php
+$db->find("contacts",['id'=>1]);
+$db->debug();
+```
+
+Devolvería:
+
+```
+SQL: [33] SELECT * FROM contacts WHERE id=:id 
+Params:  1
+Key: Name: [3] :id
+paramno=0
+name=[3] ":id"
+is_param=1
+param_type=2
+```
+
+
 ### pretty()
+
+Útil al momento de hacer debugging, con el propósito de imprimir en pantalla el resultado devuelto por una consulta, por default devuelve el resultado de la última consulta, sin embargo, puede recibir un parámetro opcional, como un objeto, variable o arreglo.
+
+```php
+$db->findAll("contacts");
+$db->pretty();
+
+$url = "https://api.github.com/users/j2deme/repos";
+$db->pretty($db->toArray($db->getJson($url)));
+```
