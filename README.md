@@ -32,12 +32,15 @@ Recibe como mínimo un parámetro, que indica la tabla sobre la que se hará la 
 Devuelve el primer registro que devuelva el resultado (`LIMIT 1`) en forma de un arreglo asociativo.
 
 ```php
-$db->find("tasks"); //Devuelve el primer registro de la tabla "tasks"
+//Devuelve el primer registro de la tabla "tasks"
+$db->find("tasks");
 $data = [
   'id' => 1
 ];
-$db->find("tasks",$data); //Devuelve el primer registro que coincida con el id = 1;
-$db->find("tasks", ['id'=>1])//Devuelve el mismo resultado que el anterior.
+//Devuelve el primer registro que coincida con el id = 1
+$db->find("tasks",$data); 
+//Devuelve el mismo resultado que la consulta anterior
+$db->find("tasks", ['id'=>1]);
 ```
 
 Es __importante__ notar que las llaves del arreglo que se pasa como segundo parámetro, deben coincidir con los nombres de las columnas existentes en la tabla, caso contrario generará un error.
@@ -47,12 +50,15 @@ Es __importante__ notar que las llaves del arreglo que se pasa como segundo par�
 Funciona de manera similar al método `find()`, recibiendo dos parámetros, el segundo opcional, con la diferencia de que devuelve todos los registros obtenidos en el resultado, en forma de un arreglo indizado de arreglos asociativos.
 
 ```php
-$db->findAll("tasks"); //Devuelve todos los registros de la tabla "tasks"
+//Devuelve todos los registros de la tabla "tasks"
+$db->findAll("tasks");
 $data = [
   'date' => "29/11/13"
 ];
-$db->findAll("tasks",$data); //Devuelve todos los registros coincida con date = "29/11/13";
-$db->findAll("tasks", ['date' => "29/11/13"]); //Devuelve el mismo resultado que el anterior.
+//Devuelve todos los registros coincida con date = "29/11/13"
+$db->findAll("tasks",$data);
+//Devuelve el mismo resultado que la consulta anterior
+$db->findAll("tasks", ['date' => "29/11/13"]); 
 ```
 
 ### save()
@@ -67,13 +73,16 @@ $data = [
   'task'=>"Learn PDO",
   'date'=>"29/11/13"
 ];
-$db->save("tasks", $data); //Crea un nuevo registro
+//Crea un nuevo registro
+$db->save("tasks", $data);
+
 $data = [
   'id' => 1
   'task'=>"Learn PDO",
   'date'=>"29/11/13"
 ];
-$db->save("tasks", $data); //Actualiza el registro con id = 1
+//Actualiza el registro con id = 1
+$db->save("tasks", $data);
 ```
 
 ### delete()
@@ -82,8 +91,11 @@ Recibe 2 parámetros, el primero la tabla sobre la cual se trabajará (`DELETE F
 Es __importante__ notar que si no se envía el segundo parámetro, por default se asume un 1, ejecutandose un `DELETE FROM tabla WHERE 1`, eliminando __todos__ los registros de la tabla.
 
 ```php
-$db->delete("tasks",['id'=>2]); //Elimina registro con id = 2
-$db->delete("tasks"); //Elimina todos los registros - Se recomienda usar la función truncate()
+//Elimina registro con id = 2
+$db->delete("tasks",['id'=>2]);
+
+//Elimina todos los registros - Se recomienda usar la función truncate()
+$db->delete("tasks");
 ```
 
 ### count()
@@ -91,9 +103,12 @@ $db->delete("tasks"); //Elimina todos los registros - Se recomienda usar la func
 No contiene parámetros, y devuelve el número de filas contenidas en el resultado de la última consulta.
 
 ```php
-$db->find("tasks",['id'=>1]); //Primer registro que coincida con id = 1
+//Primer registro que coincida con id = 1
+$db->find("tasks",['id'=>1]);
 echo $db->count(); //Devuelve 1
-$db->findAll("tasks"); //Suponiendo que existan 10 registros
+
+//Suponiendo que existan 10 registros
+$db->findAll("tasks");
 echo $db->count(); //Devuelve 10
 ```
 
@@ -103,7 +118,7 @@ Devuelve el __id__ del último registro insertado, no requiere de parámetros.
 
 ```php
 //Suponiendo 10 registros consecutivos, con ids del 1 al 10
-$db->save("tasks",['task' => "Test lastId() Function"]); //Una inserción, puesto que no se indica id
+$db->save("tasks",['task' => "Test lastId() Function"]);
 echo $db->lastId(); //Devolvería 11
 ```
 
@@ -140,11 +155,15 @@ Permiten el manejo de transacciones, y deben estar contenidas dentro de un __try
 
 ```php
 try {
-  $db->begin(); //Inicia la transacción
-  ... //Inserciones, actualizacionesy borrados
-  $db->end(); //Finaliza la transacción sino hubo problemas
+  //Inicia la transacción
+  $db->begin();
+  //Inserciones, actualizacionesy borrados
+  ...
+  //Finaliza la transacción sino hubo problemas
+  $db->end();
 } catch(Exception $e){
-  $db->cancel(); //Deshace los cambios si hubo algún problema
+  //Deshace los cambios si hubo algún problema
+  $db->cancel();
   return $e->getMessage();
 }
 ```
@@ -153,14 +172,19 @@ También es posible lanzar una excepción si alguna condición deseada no se cum
 
 ```php
 try {
-  $db->begin(); //Inicia la transacción
-  $db->find("users",['username' => "j2deme", 'password'=> "12345"]); //Busca a un usuario específico
-  if($db->count() == 0){ //No se encontró al usuario
+  //Inicia la transacción
+  $db->begin();
+  //Busca a un usuario específico
+  $db->find("users",['username' => "j2deme", 'password'=> "12345"]);
+  //No se encontró al usuario
+  if($db->count() == 0){
     throw new MyException("Usuario no válido");
   }
-  $db->end(); //Finaliza la transacción sino hubo problemas
+  //Finaliza la transacción sino hubo problemas
+  $db->end();
 } catch(Exception $e){
-  $db->cancel(); //Deshace los cambios si hubo algún problema
+  //Deshace los cambios si hubo algún problema
+  $db->cancel();
   return $e->getMessage();
 }
 ```
@@ -193,8 +217,11 @@ $db->create('contacts', $cols);
 Recibe un único parámetro, el cual indica el nombre de la tabla a eliminar. Antes de intentar la eliminación, se hace la verificación de que la tabla exista, caso contrario no se elimina nada. Si no se envía el parámetro necesario, devuelve `false`.
 
 ```php
-$db->drop("contacts"); //Elimina la tabla 'contacts' y todos sus datos
-$db->drop("tabla_no_existente"); //Devuelve false
+//Elimina la tabla 'contacts' y todos sus datos
+$db->drop("contacts");
+
+//Devuelve false
+$db->drop("tabla_no_existente");
 ```
 
 ### truncate()
@@ -204,8 +231,11 @@ Elimina todos los registros de la tabla indicada como parámetro, sino se indica
 Usar `truncate()` es más rápido y eficiente computacionalmente que usar `delete()`.
 
 ```php
-$db->delete("contacts"); //Elimina todos los registros
-$db->truncate("contacts"); //Elimina todos los registros y reinicia contadores
+//Elimina todos los registros
+$db->delete("contacts");
+
+//Elimina todos los registros y reinicia contadores
+$db->truncate("contacts");
 ```
 
 ## Conversión de formatos
@@ -219,9 +249,10 @@ $db->truncate("contacts"); //Elimina todos los registros y reinicia contadores
 Devuelve el resultado de la última consulta en formato JSON.
 
 ```php
-$db->findAll('tasks');
 //Para forzar el formato JSON en UTF-8
 header('Content-type: application/json; charset=utf-8');
+
+$db->findAll('tasks');
 echo $db->toJson();
 ```
 
@@ -243,7 +274,9 @@ Puede recibir un segundo parámetro booleano opcional, que indica si se utiliza 
 
 ```php
 $url = "https://api.github.com/users/j2deme/repos";
-$db->getJson($url); //Devuelve una string conteniendo la respuesta en JSON
+
+//Devuelve una string conteniendo la respuesta en JSON
+$db->getJson($url);
 ```
 
 La url de ejemplo muestra en formato JSON todos los repositorios relacionados a mi cuenta: [j2deme](https://api.github.com/users/j2deme/repos).
