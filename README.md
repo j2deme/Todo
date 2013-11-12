@@ -39,6 +39,7 @@ $data = [
 ];
 //Devuelve el primer registro que coincida con el id = 1
 $db->find("tasks",$data); 
+
 //Devuelve el mismo resultado que la consulta anterior
 $db->find("tasks", ['id'=>1]);
 ```
@@ -57,6 +58,7 @@ $data = [
 ];
 //Devuelve todos los registros coincida con date = "29/11/13"
 $db->findAll("tasks",$data);
+
 //Devuelve el mismo resultado que la consulta anterior
 $db->findAll("tasks", ['date' => "29/11/13"]); 
 ```
@@ -68,11 +70,14 @@ Recibe 2 parámetros, siendo el primero el nombre de la tabla, y el segundo un a
 Si el arreglo pasado como segundo parámetro contiene la llave __id__, se considera como una actualización (`UPDATE`), en caso de que la llave no este presente se supone una inserción (`INSERT INTO`), es __importante__ que todas las columnas que no permitan valores nulos esten presentes en el arreglo dado.
 
 ```php
-$db->save("tasks"); //Devolvería false
+//Devolvería false, porque no se pasa el segundo parámetro
+$db->save("tasks");
+
 $data = [
   'task'=>"Learn PDO",
   'date'=>"29/11/13"
 ];
+
 //Crea un nuevo registro
 $db->save("tasks", $data);
 
@@ -81,6 +86,7 @@ $data = [
   'task'=>"Learn PDO",
   'date'=>"29/11/13"
 ];
+
 //Actualiza el registro con id = 1
 $db->save("tasks", $data);
 ```
@@ -133,16 +139,18 @@ $data = [
   'min' => 2,
   'max' => 5
 ];
+
 //Selecciona una columna específica con una condición dada por un rango
 $db->sql("SELECT task FROM tasks WHERE id > :min AND id < :max",$data);
 
 //Creación de una tabla - Se recomienda usar la función create()
 $data = [
-  'col1' => "name varchar(50) NOT NULL",
-  'col2' => "age int NOT NULL",
-  'col3' => "sex varchar(1) DEFAULT 'H'"
+  'col1' => "id int PRIMARY KEY AUTO_INCREMENT",
+  'col2' => "name varchar(50) NOT NULL",
+  'col3' => "age int NOT NULL",
+  'col4' => "sex varchar(1) DEFAULT 'H'"
 ];
-$db->sql("CREATE TABLE :tabla (id int PRIMARY KEY AUTO_INCREMENT,:col1,:col2,:col2)", $data);
+$db->sql("CREATE TABLE :tabla (:col1,:col2,:col3,:col4)", $data);
 ```
 
 ## Transacciones
