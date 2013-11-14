@@ -110,7 +110,7 @@ class DB {
 
   public function save($table, $data = []){
     $sql = "";
-    if(empty($data)){
+    if(!empty($data)){
       if(isset($data['id'])){
         $sql .= "UPDATE $table SET ";
         $attrs = [];
@@ -169,6 +169,7 @@ class DB {
     foreach ($data as $col => $value) {
       $attrs[] = "$col=:$col";
     }
+
     if(empty($attrs)){
       $sql .= "1";
     } else {
