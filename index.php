@@ -25,6 +25,9 @@ foreach ($tareas as $tarea){
   echo $tarea['id']." - ".$tarea['task']." <a style=\"color:red\" href=\"delete.php?id=".$tarea['id']."\">&times;</a> | <a href=\"update.php?id=".$tarea['id']."\">Editar</a><br/>";
 }
 ?>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery.js"></script>
   <!-- Latest compiled and minified JavaScript -->
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
 </body>
