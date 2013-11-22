@@ -51,9 +51,9 @@ class DB {
     return $this->dbh->rollBack();
   }
 
-  public function find($table, $data = []){
+  public function find($table, $data = array()){
     $sql = "SELECT * FROM $table WHERE ";
-    $attrs = [];
+    $attrs = array();
     foreach ($data as $col => $value) {
       $attrs[] = "$col=:$col";
     }
@@ -79,9 +79,9 @@ class DB {
     return $this->utf8_decode_mix($this->result);
   }
 
-  public function findAll($table, $data = []){
+  public function findAll($table, $data = array()){
     $sql = "SELECT * FROM $table WHERE ";
-    $attrs = [];
+    $attrs = array();
     foreach ($data as $col => $value) {
       $attrs[] = "$col=:$col";
     }
@@ -108,12 +108,12 @@ class DB {
     return $this->utf8_decode_mix($this->result);
   }
 
-  public function save($table, $data = []){
+  public function save($table, $data = array()){
     $sql = "";
     if(!empty($data)){
       if(isset($data['id'])){
         $sql .= "UPDATE $table SET ";
-        $attrs = [];
+        $attrs = array();
         foreach ($data as $col => $value) {
           if($col != 'id'){
             $attrs[] = "$col=:$col";
@@ -129,7 +129,7 @@ class DB {
         $sql .= "WHERE id=:id";
       } else {
         $sql .= "INSERT INTO $table (";
-        $attrs = [];
+        $attrs = array();
         foreach ($data as $col => $value) {
             $attrs[] = $col;
         }
@@ -163,9 +163,9 @@ class DB {
     }
   }
 
-  public function delete($table, $data = []){
+  public function delete($table, $data = array()){
     $sql = "DELETE FROM $table WHERE ";
-    $attrs = [];
+    $attrs = array();
     foreach ($data as $col => $value) {
       $attrs[] = "$col=:$col";
     }
@@ -198,14 +198,14 @@ class DB {
     return $this->dbh->lastInsertId();
   }
 
-  public function sql($sql, $data = []){
+  public function sql($sql, $data = array()){
     $this->st = $this->dbh->prepare($sql);
     foreach ($data as $key => $value) {
       $this->bind($key,$value);
     }
     $this->result = $this->st->execute();
     $this->disconnect();
-    if(strpos(strtolower($sql),"select") !== false ){
+    if(strpos(strtolower($sql),"select ") !== false ){
       if($this->count() > 1){
         $this->result = $this->st->FetchAll();
       } else {
@@ -242,10 +242,10 @@ class DB {
     return $this->st->debugDumpParams();
   }
 
-  public function create($name, $cols = []){
+  public function create($name, $cols = array()){
     $sql = "CREATE TABLE IF NOT EXISTS $name (";
     if (empty($cols)) {
-      $cols[] = ['id' => 'int NOT NULL PRIMARY KEY AUTO_INCREMENT'];
+      $cols[] = array('id' => 'int NOT NULL PRIMARY KEY AUTO_INCREMENT');
     }
     $temp = array_keys($cols);
     $last_key = end($temp);
@@ -276,7 +276,7 @@ class DB {
     }
   }
 
-  public function pretty($arr = []){
+  public function pretty($arr = array()){
     echo "<pre>";
     if(!empty($arr)){
       print_r($arr);
@@ -302,7 +302,7 @@ class DB {
   public function toJson(){
     $rows = $this->result;
     if(empty($this->result)){
-      return json_encode([], JSON_NUMERIC_CHECK);
+      return json_encode(array(), JSON_NUMERIC_CHECK);
     } else {
       if(is_array($this->result) && !isset($this->result['id'])){
         foreach ($this->result as $row) {

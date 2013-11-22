@@ -2,11 +2,11 @@
 include "DB.php";
 # json.php
 $db = new DB("root","root","localhost","todo");
-$rows = [];
-$result = [];
+$rows = array();
+$result = array();
 $num_rows = 0;
 if(isset($_GET['id'])){
-  $result = $db->find('tasks',['id'=>$_GET['id']]);
+  $result = $db->find('tasks',array('id'=>$_GET['id']));
   $num_rows = $db->count();
 } else {
   $result = $db->findAll('tasks');

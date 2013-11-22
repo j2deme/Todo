@@ -5,11 +5,11 @@ $id = (isset($_POST['id'])) ? $_POST['id'] : 0;
 
 if($tarea != ""){
   $db = new DB("root","root","localhost","todo");
-  $data = [];
+  $data = array();
   if($id == 0){
-    $data = ['task' => $tarea];
+    $data = array('task' => $tarea);
   } else {
-    $data = ['task' => $tarea, 'id' => $id];
+    $data = array('task' => $tarea, 'id' => $id);
   }
   $db->save("tasks",$data);
 }

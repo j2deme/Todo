@@ -3,7 +3,7 @@ include "DB.php";
 $id = (isset($_GET['id'])) ? (int)$_GET['id'] : 0;
 if($id != 0){
   $db = new DB("root","root","localhost","todo");
-  $tarea = $db->find('tasks',['id'=>$id]);
+  $tarea = $db->find('tasks',array('id'=>$id);
 ?>
 <html>
 <head>
