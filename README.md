@@ -12,7 +12,7 @@ Se instancia pasando 4 parámetros:
 4. Nombre de la base de datos.
 
 ```php
-$db = new DB("root","root","localhost","todo");
+$db = new DB('root','root','localhost','todo');
 ```
 
 ## CRUD
@@ -33,15 +33,15 @@ Devuelve el primer registro que devuelva el resultado (`LIMIT 1`) en forma de un
 
 ```php
 //Devuelve el primer registro de la tabla "tasks"
-$db->find("tasks");
-$data = [
+$db->find('tasks');
+$data = array(
   'id' => 1
-];
+);
 //Devuelve el primer registro que coincida con el id = 1
-$db->find("tasks",$data); 
+$db->find('tasks', $data);
 
 //Devuelve el mismo resultado que la consulta anterior
-$db->find("tasks", ['id'=>1]);
+$db->find('tasks', array('id' => 1));
 ```
 
 Es __importante__ notar que las llaves del arreglo que se pasa como segundo parámetro, deben coincidir con los nombres de las columnas existentes en la tabla, caso contrario generará un error.
@@ -52,15 +52,15 @@ Funciona de manera similar al método `find()`, recibiendo dos parámetros, el s
 
 ```php
 //Devuelve todos los registros de la tabla "tasks"
-$db->findAll("tasks");
-$data = [
-  'date' => "29/11/13"
-];
-//Devuelve todos los registros coincida con date = "29/11/13"
-$db->findAll("tasks",$data);
+$db->findAll('tasks');
+$data = array(
+  'date' => '29/11/13'
+);
+//Devuelve todos los registros coincida con date = 29/11/13
+$db->findAll('tasks', $data);
 
 //Devuelve el mismo resultado que la consulta anterior
-$db->findAll("tasks", ['date' => "29/11/13"]); 
+$db->findAll('tasks', array('date' => '29/11/13'));
 ```
 
 ### save()
@@ -71,24 +71,24 @@ Si el arreglo pasado como segundo parámetro contiene la llave __id__, se consid
 
 ```php
 //Devolvería false, porque no se pasa el segundo parámetro
-$db->save("tasks");
+$db->save('tasks');
 
-$data = [
-  'task'=>"Learn PDO",
-  'date'=>"29/11/13"
-];
+$data = array(
+  'task' => 'Learn PDO',
+  'date' => '29/11/13'
+);
 
 //Crea un nuevo registro
-$db->save("tasks", $data);
+$db->save('tasks', $data);
 
-$data = [
-  'id' => 1
-  'task'=>"Learn PDO",
-  'date'=>"29/11/13"
-];
+$data = array(
+  'id'   => 1
+  'task' => 'Learn PDO',
+  'date' => '29/11/13'
+);
 
 //Actualiza el registro con id = 1
-$db->save("tasks", $data);
+$db->save('tasks', $data);
 ```
 
 ### delete()
@@ -98,10 +98,10 @@ Es __importante__ notar que si no se envía el segundo parámetro, por default s
 
 ```php
 //Elimina registro con id = 2
-$db->delete("tasks",['id'=>2]);
+$db->delete('tasks', array('id' => 2));
 
 //Elimina todos los registros - Se recomienda usar la función truncate()
-$db->delete("tasks");
+$db->delete('tasks');
 ```
 
 ### count()
@@ -110,21 +110,23 @@ No contiene parámetros, y devuelve el número de filas contenidas en el resulta
 
 ```php
 //Primer registro que coincida con id = 1
-$db->find("tasks",['id'=>1]);
+$db->find('tasks', array('id' => 1));
 echo $db->count(); //Devuelve 1
 
 //Suponiendo que existan 10 registros
-$db->findAll("tasks");
+$db->findAll('tasks');
 echo $db->count(); //Devuelve 10
 ```
 
 ### lastId()
 
-Devuelve el __id__ del último registro insertado, no requiere de parámetros.
+Devuelve el __id__ del último registro insertado, no requiere de parámetros, esta función depende
+del SGBD subyacente, por lo que podría devolver `null`, que no significaría necesariamente que no
+se hayan insertado registros.
 
 ```php
 //Suponiendo 10 registros consecutivos, con ids del 1 al 10
-$db->save("tasks",['task' => "Test lastId() Function"]);
+$db->save('tasks', aray('task' => 'Test lastId() function'));
 echo $db->lastId(); //Devolvería 11
 ```
 
@@ -135,22 +137,24 @@ Permite manejar consultas más complejas, como _selects_ con condiciones unidas 
 Recibe dos parámeros, el primero un _string_ conteniendo un _prepared statement_ (preferentemente), y el segundo (opcional), un arreglo de pares llave-valor que reemplazen los espacios en el _prepared statement_, si así corresponde.
 
 ```php
-$data = [
+$data = array(
   'min' => 2,
   'max' => 5
-];
+);
 
 //Selecciona una columna específica con una condición dada por un rango
-$db->sql("SELECT task FROM tasks WHERE id > :min AND id < :max",$data);
+//Notese el uso de comillas dobles
+$db->sql("SELECT task FROM tasks WHERE id > :min AND id < :max", $data);
 
 //Creación de una tabla - Se recomienda usar la función create()
-$data = [
+$data = array(
   'col1' => "id int PRIMARY KEY AUTO_INCREMENT",
   'col2' => "name varchar(50) NOT NULL",
   'col3' => "age int NOT NULL",
   'col4' => "sex varchar(1) DEFAULT 'H'"
-];
-$db->sql("CREATE TABLE :tabla (:col1,:col2,:col3,:col4)", $data);
+);
+//No ha sido probado
+$db->sql("CREATE TABLE :tabla (:col1, :col2, :col3, :col4)", $data);
 ```
 
 ## Transacciones
@@ -165,7 +169,7 @@ Permiten el manejo de transacciones, y deben estar contenidas dentro de un __try
 try {
   //Inicia la transacción
   $db->begin();
-  //Inserciones, actualizacionesy borrados
+  //Inserciones, actualizaciones y borrados
   ...
   //Finaliza la transacción sino hubo problemas
   $db->end();
@@ -183,7 +187,7 @@ try {
   //Inicia la transacción
   $db->begin();
   //Busca a un usuario específico
-  $db->find("users",['username' => "j2deme", 'password'=> "12345"]);
+  $db->find("users", array('username' => "j2deme", 'password'=> "12345"));
   //No se encontró al usuario
   if($db->count() == 0){
     throw new MyException("Usuario no válido");
@@ -212,12 +216,12 @@ Recibe como entrada dos parámetros, el primero el nombre de la tabla, y el segu
 En caso de que no se indique el segundo parámetro, por default se crea el campo __id__ entero, autonumérico como llave primaria (`id int PRIMARY KEY AUTO_INCREMENT NOT NULL`).
 
 ```php
-$cols = [
-  'id' => 'int PRIMARY KEY AUTO_INCREMENT NOT NULL',
-  'name' => 'varchar(50) NOT NULL',
-  'age' => 'int',
+$cols = array(
+  'id'      => 'int PRIMARY KEY AUTO_INCREMENT NOT NULL',
+  'name'    => 'varchar(50) NOT NULL',
+  'age'     => 'int',
   'address' => 'text'
-];
+);
 $db->create('contacts', $cols);
 ```
 ### drop()
@@ -226,10 +230,10 @@ Recibe un único parámetro, el cual indica el nombre de la tabla a eliminar. An
 
 ```php
 //Elimina la tabla 'contacts' y todos sus datos
-$db->drop("contacts");
+$db->drop('contacts');
 
 //Devuelve false
-$db->drop("tabla_no_existente");
+$db->drop('tabla_no_existente');
 ```
 
 ### truncate()
@@ -240,10 +244,10 @@ Usar `truncate()` es más rápido y eficiente computacionalmente que usar `delet
 
 ```php
 //Elimina todos los registros
-$db->delete("contacts");
+$db->delete('contacts');
 
 //Elimina todos los registros y reinicia contadores
-$db->truncate("contacts");
+$db->truncate('contacts');
 ```
 
 ## Conversión de formatos
@@ -307,17 +311,17 @@ $db->toArray($db->getJson($url));
 
 Muestra los parámetros pasados a la conexión generada mediante PDO, por la última consulta realizada, tales como el _prepared statement_ y sus parámetros. Útil cuando hay duda al utilizar la función `sql()`.
 
-__No__ lleva ningún parámetro.
+__No__ lleva ningún parámetro, y se invoca inmediatamente después de la consulta a debuggear.
 
 ```php
-$db->find("contacts",['id'=>1]);
+$db->find('contacts', array('id' => 1));
 $db->debug();
 ```
 
 Devolvería:
 
 ```
-SQL: [33] SELECT * FROM contacts WHERE id=:id 
+SQL: [33] SELECT * FROM contacts WHERE id=:id
 Params:  1
 Key: Name: [3] :id
 paramno=0
@@ -332,7 +336,7 @@ param_type=2
 Útil al momento de hacer debugging, con el propósito de imprimir en pantalla el resultado devuelto por una consulta, por default devuelve el resultado de la última consulta, sin embargo, puede recibir un parámetro opcional, como un objeto, variable o arreglo.
 
 ```php
-$db->findAll("contacts");
+$db->findAll('contacts');
 $db->pretty();
 
 $url = "https://api.github.com/users/j2deme/repos";
